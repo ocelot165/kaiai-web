@@ -1,0 +1,50 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="11.5" fill="white" stroke="black" />
+    <g opacity="0.6">
+        <mask id="mask0_1470_119024" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="7"
+            y="9" width="10" height="6">
+            <path d="M7.20001 9.36786H16.7962V14.3752H7.20001V9.36786Z" fill="white" />
+        </mask>
+        <g mask="url(#mask0_1470_119024)">
+            <path
+                d="M11.9991 9.36786L7.20001 11.5459L11.9991 14.3752L16.7962 11.5459L11.9991 9.36786Z"
+                fill="#010101" />
+        </g>
+    </g>
+    <g opacity="0.45">
+        <mask id="mask1_1470_119024" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="7"
+            y="3" width="5" height="12">
+            <path d="M7.20001 3.59998H11.9991V14.3752H7.20001V3.59998Z" fill="white" />
+        </mask>
+        <g mask="url(#mask1_1470_119024)">
+            <path d="M7.20001 11.5459L11.9991 14.3752V3.59998L7.20001 11.5459Z" fill="#010101" />
+        </g>
+    </g>
+    <g opacity="0.8">
+        <mask id="mask2_1470_119024" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="11"
+            y="3" width="6" height="12">
+            <path d="M11.9991 3.59998H16.7981V14.3752H11.9991V3.59998Z" fill="white" />
+        </mask>
+        <g mask="url(#mask2_1470_119024)">
+            <path d="M11.9991 3.59998V14.3752L16.7962 11.5459L11.9991 3.59998Z" fill="#010101" />
+        </g>
+    </g>
+    <g opacity="0.45">
+        <mask id="mask3_1470_119024" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="7"
+            y="12" width="5" height="8">
+            <path d="M7.20001 12.4532H11.9991V19.2H7.20001V12.4532Z" fill="white" />
+        </mask>
+        <g mask="url(#mask3_1470_119024)">
+            <path d="M7.20001 12.4532L11.9991 19.2V15.2826L7.20001 12.4532Z" fill="#010101" />
+        </g>
+    </g>
+    <g opacity="0.8">
+        <mask id="mask4_1470_119024" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="11"
+            y="12" width="6" height="8">
+            <path d="M11.9991 12.4532H16.8V19.2H11.9991V12.4532Z" fill="white" />
+        </mask>
+        <g mask="url(#mask4_1470_119024)">
+            <path d="M11.9991 15.2826V19.2L16.8 12.4532L11.9991 15.2826Z" fill="#010101" />
+        </g>
+    </g>
+</svg>
