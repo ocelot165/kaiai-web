@@ -13,10 +13,12 @@ dotenv.config();
 const port = 3101;
 const app = express();
 const server = http.createServer(app);
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ALLOWED_ORIGIN! }));
 app.use(bodyParser.json());
 
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+  cors: { origin: process.env.CORS_ALLOWED_ORIGIN! },
+});
 mongoose.set("strictQuery", false);
 
 const limiter = rateLimit({
