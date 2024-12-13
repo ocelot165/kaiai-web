@@ -1,6 +1,6 @@
 # kAIa chatroom
 
-This repo contains the frontend and backend code needed to run the kAIa chatroom
+This repo contains the frontend and backend code needed to run the kAIa chatroom for the smoovie-phone ecosystem
 
 ## Installation
 
