@@ -31,6 +31,8 @@ import Stats from "three/addons/libs/stats.module.js";
 import { DynamicBones } from "./dynamicbones.js";
 import { LipsyncEn } from "./lipsync-en.js";
 
+THREE.Cache.enabled = true;
+
 // Temporary objects for animation loop
 const q = new THREE.Quaternion();
 const e = new THREE.Euler();
@@ -5969,6 +5971,13 @@ class TalkingHead {
       anim.ts[0] = this.animClock;
     }
     this.setPoseFromTemplate(null);
+  }
+
+  async loadAnimations(urls, callbacks) {
+    const fbxLoader = new FBXLoader();
+    for (var index = 0; index < urls.length; index++) {
+      fbxLoader.loadAsync(urls[index], callbacks[index]);
+    }
   }
 
   /**

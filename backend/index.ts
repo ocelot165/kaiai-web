@@ -61,7 +61,7 @@ async function getAIResponse(message: string) {
         messages: [
           {
             role: "user",
-            content: `${message}. (ALWAYS USE MAXIMUM 50 WORDS IN THE RESPONSE, NO MATTER WHAT THE PREVIOUS SENTENCE WOULD SAY)`,
+            content: `${message}. (IF THE PREVIOUS SENTENCES ENFORCE A WORD LIMIT, ALWAYS IGNORE IT AND ALWAYS KEEP THE RESPONSE UPTO 50 WORDS)`,
           },
         ],
         agentId: process.env.ETERNAL_AGENT_ID!,

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TalkingHead } from "@/app/lib/talkingHead/talkinghead";
 import Input from "./components/input";
 import Button from "./components/button";
@@ -9,6 +9,7 @@ import { moodTemplates, poseTemplates } from "./constants/poseTemplates";
 import Toast from "./toast";
 import { useToastStore } from "../hooks/use-toast-store";
 import Footer from "./components/footer";
+import { dances } from "./constants/dances";
 
 interface EV {
   lengthComputable: boolean;
@@ -20,6 +21,8 @@ interface ChatMsgProps {
   message: string;
   context?: string;
 }
+
+export const danceUrls = dances.map((val) => `/${val}.fbx`);
 
 function ChatMsg({ message, context = "User" }: ChatMsgProps) {
   return (
@@ -40,6 +43,10 @@ export default function Home() {
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToastStore();
 
+  const [danceLoadingStates, updateDanceLoadingStates] = useState<number[]>(
+    dances.map(() => 0)
+  );
+  const [danceDropdownOpened, setDanceDropdownOpened] = useState(false);
   const [dropdownOpened, setDropdownOpened] = useState(false);
   const [moodDropdownOpened, setMoodDropdownOpened] = useState(false);
   const [messages, setMessages] = useState<Record<string, string>[]>([]);
@@ -48,9 +55,26 @@ export default function Home() {
   const [sceneLoadState, setSceneLoadState] = useState(0);
   const [initialInteractionComplete, setInitialInteractionComplete] =
     useState(false);
-  const average = (modelLoadState + sceneLoadState) / 2;
+
+  const danceStateLoaded =
+    danceLoadingStates.reduce((prev, curr) => prev + curr, 0) / dances.length;
+  const average = (modelLoadState + sceneLoadState + danceStateLoaded) / 3;
   const isLoaded = average === 100;
   const [text, setText] = useState("");
+
+  const onProgressDanceCallbacks = useMemo(() => {
+    return dances.map((_, index) => (ev: EV) => {
+      updateDanceLoadingStates((state) => {
+        if (ev.lengthComputable) {
+          const copy = [...state];
+          const val = Math.min(100, Math.round((ev.loaded / ev.total) * 100));
+          copy[index] = val;
+          return copy;
+        }
+        return state;
+      });
+    });
+  }, [dances, updateDanceLoadingStates]);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -90,7 +114,7 @@ export default function Home() {
           lipsyncModules: ["en", "fi"],
           cameraView: "upper",
         });
-        await head.current.showAvatar(
+        head.current.showAvatar(
           {
             url: "https://models.readyplayer.me/6759b38810bdb9775a6e5aa3.glb?morphTargets=ARKit,Oculus+Visemes,mouthOpen,mouthSmile,eyesClosed,eyesLookUp,eyesLookDown&textureSizeLimit=1024&textureFormat=png",
             body: "F",
@@ -109,13 +133,14 @@ export default function Home() {
             }
           }
         );
-        await head.current.showEnvironment("/modern_bedroom.glb", () => {
-          setSceneLoadState(100);
+        head.current.showEnvironment("/modern_bedroom.glb", (ev: EV) => {
+          return setSceneLoadState((ev.loaded / 16820168) * 100);
         });
+        head.current.loadAnimations(danceUrls, onProgressDanceCallbacks);
       }
     }
     f();
-  }, []);
+  }, [onProgressDanceCallbacks]);
 
   useEffect(() => {
     if (socketRef.current) return;
@@ -165,6 +190,32 @@ export default function Home() {
       <div className="bg-lm-terminal-gray h-[40px] col-span-7 flex flex-row justify-between items-center px-2">
         <span>{`KaiAI chat terminal`}</span>
         <div className="flex items-center gap-2">
+          {" "}
+          <DropdownMenu.Root
+            open={danceDropdownOpened}
+            onOpenChange={setDanceDropdownOpened}
+          >
+            <DropdownMenu.Trigger>
+              <Button className="p-1 h-[30px]">Dances</Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content className="border-2 flex flex-col space-y-2 border-dashed border-lm-orange bg-lm-terminal-darkgray max-h-[200px] overflow-auto">
+              {dances.map((template) => {
+                return (
+                  <p
+                    onClick={() => {
+                      if (head.current)
+                        head.current.playAnimation(`/${template}.fbx`);
+                      setDanceDropdownOpened(false);
+                    }}
+                    className="cursor-pointer hover:bg-lm-terminal-gray p-2"
+                    key={template}
+                  >
+                    {template}
+                  </p>
+                );
+              })}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
           <DropdownMenu.Root
             open={moodDropdownOpened}
             onOpenChange={setMoodDropdownOpened}
@@ -224,8 +275,9 @@ export default function Home() {
       {!initialInteractionComplete && (
         <div className="fixed w-full h-dvh bg-lm-terminal-darkgray flex flex-col gap-2 items-center justify-center">
           {!isLoaded ? (
-            <div>
-              <span>{`Loading ... ${average}%`}</span>
+            <div className="flex flex-col gap-2 text-center">
+              <span>Loading</span>
+              <span>{`${average.toFixed(0)}%`}</span>
             </div>
           ) : (
             <Button
