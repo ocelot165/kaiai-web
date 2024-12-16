@@ -10,6 +10,7 @@ import Toast from "./toast";
 import { useToastStore } from "../hooks/use-toast-store";
 import Footer from "./components/footer";
 import { dances } from "./constants/dances";
+import YouTube from "react-youtube";
 
 interface EV {
   lengthComputable: boolean;
@@ -35,6 +36,16 @@ function ChatMsg({ message, context = "User" }: ChatMsgProps) {
     </div>
   );
 }
+
+const opts = {
+  height: "390",
+  width: "640",
+  playerVars: {
+    autoplay: 1,
+    loop: 1,
+    volume: 10,
+  },
+};
 
 export default function Home() {
   const head = useRef<TalkingHead>();
@@ -74,7 +85,7 @@ export default function Home() {
         return state;
       });
     });
-  }, [dances, updateDanceLoadingStates]);
+  }, [updateDanceLoadingStates]);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -292,10 +303,22 @@ export default function Home() {
       <div
         ref={nodeAvatarRef}
         className="xs:col-span-7 md:col-span-5 h-full max-h-[calc(100dvh-70px)] xs:h-[50dvh] md:h-[calc(100dvh-70px)]"
-      ></div>
+      >
+        {initialInteractionComplete && (
+          <div className="hidden">
+            <YouTube
+              videoId="VXY2P8vKgV4"
+              opts={opts}
+              onReady={(e: { target: { setVolume: (c: number) => void } }) => {
+                e.target.setVolume(10);
+              }}
+            />
+          </div>
+        )}
+      </div>
       <div
         id="controls"
-        className="xs:col-span-7 md:col-span-2 flex flex-col justify-between max-h-[calc(100dvh-70px)] xs:h-[calc(50dvh-70px)] md:h-[calc(100dvh-30px)]"
+        className="z-1 xs:col-span-7 md:col-span-2 flex flex-col justify-between max-h-[calc(100dvh-70px)] xs:h-[calc(50dvh-70px)] md:h-[calc(100dvh-30px)]"
       >
         <div
           ref={messageContainerRef}
