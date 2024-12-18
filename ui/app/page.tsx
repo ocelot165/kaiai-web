@@ -23,7 +23,7 @@ interface ChatMsgProps {
   context?: string;
 }
 
-export const danceUrls = dances.map((val) => `/${val}.fbx`);
+const danceUrls = dances.map((val) => `/${val}.fbx`);
 
 function ChatMsg({ message, context = "User" }: ChatMsgProps) {
   return (
