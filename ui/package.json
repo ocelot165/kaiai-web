@@ -27,12 +27,14 @@
     "next": "14.2.11",
     "react": "^18",
     "react-dom": "^18",
+    "react-youtube": "^10.1.0",
     "sass": "^1.79.5",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.5.2",
     "three": "^0.171.0",
     "viem": "2.x",
     "wagmi": "^2.12.11",
+    "youtube-iframe": "^1.0.3",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
