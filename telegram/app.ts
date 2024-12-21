@@ -9,13 +9,12 @@ dotenv.config();
 
 mongoose.set("strictQuery", false);
 
-const excludedIDs: number[] = [];
-
 const token = process.env.BOT_TOKEN!;
 const agentid = process.env.ETERNAL_AGENT_ID!;
 const eternalKey = process.env.ETERNAL_API_KEY!;
 const dbUrl = process.env.DATABASE_URL!;
 const groupId = process.env.GROUP_ID!;
+const botUsername = process.env.BOT_USERNAME!;
 
 if (typeof token !== "string") throw new Error("Need a token").message;
 if (typeof agentid !== "string") throw new Error("Need an agent id").message;
@@ -23,6 +22,8 @@ if (typeof eternalKey !== "string")
   throw new Error("Need an eternal api key").message;
 if (typeof dbUrl !== "string") throw new Error("Need a db url").message;
 if (typeof groupId !== "string") throw new Error("Need a group id").message;
+if (typeof botUsername !== "string")
+  throw new Error("Need a bot username").message;
 
 function probability(n: number) {
   return Math.random() < n;
@@ -133,10 +134,10 @@ const bot = new Telegraf(token);
 
 bot.start((ctx) => ctx.reply("Hello, im AI Agent kAia! Lets chat!"));
 
-bot.mention("@AiAgentkAiaBot", async (ctx) => {
+bot.mention(botUsername, async (ctx) => {
   if (Number(groupId) === ctx.chat.id) {
     if (ctx.message && (ctx.message as any).text) {
-      if (!excludedIDs.includes(ctx.message.from.id)) {
+      if (ctx.from && !(ctx.from as any).is_bot) {
         const entities = ctx.entities();
         for (const entity of entities) {
           if (entity.type === "mention") {
@@ -175,7 +176,7 @@ bot.on("text", async (ctx) => {
     );
   } else {
     if (Number(groupId) === ctx.chat.id) {
-      if (!excludedIDs.includes(ctx.message.from.id)) {
+      if (!ctx.from.is_bot) {
         const entities = ctx.entities();
         if (entities.length) return;
         if (probability(0.1)) {
