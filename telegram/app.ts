@@ -207,6 +207,5 @@ async function sendRandomThought() {
 
 bot.launch(async () => {
   await mongoose.connect(dbUrl);
-  //u
   console.log("Started tg bot");
 });
