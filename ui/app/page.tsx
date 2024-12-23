@@ -12,6 +12,7 @@ import Footer from "./components/footer";
 import { dances } from "./constants/dances";
 import YouTube from "react-youtube";
 import { cn } from "./utils/cn";
+import { useSearchParams } from "next/navigation";
 
 interface EV {
   lengthComputable: boolean;
@@ -55,6 +56,10 @@ export default function Home() {
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToastStore();
   const [timeout, setTimeoutRef] = useState<NodeJS.Timeout>();
+
+  const searchParams = useSearchParams();
+
+  const removeBars = searchParams.get("removeBars");
 
   const [danceLoadingStates, updateDanceLoadingStates] = useState<number[]>(
     dances.map(() => 0)
@@ -215,6 +220,7 @@ export default function Home() {
 
   return (
     <div className="grid grid-cols-7 h-dvh">
+      {!removeBars && <div className="scanlines"></div>}
       <Toast />
       <div className="bg-lm-terminal-gray h-[40px] col-span-7 flex flex-row justify-between items-center px-2">
         <span>{`KaiAI chat terminal`}</span>
