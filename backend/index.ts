@@ -123,7 +123,7 @@ async function processSankoMessage(
   isGift: boolean,
   overrideSpeechContent?: string
 ) {
-  if (isAction && overrideSpeechContent) {
+  if ((isAction || isGift) && overrideSpeechContent) {
     //push message to dynamodb
     await Message.create({ message: overrideSpeechContent, context: "kAia" });
     const res = await fetch(
