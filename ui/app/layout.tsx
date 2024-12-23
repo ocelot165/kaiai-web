@@ -3,6 +3,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.scss";
 
 import localFont from "next/font/local";
+import { Suspense } from "react";
 
 const pixerFont = localFont({ src: "./fonts/clacon2.woff2" });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
       <body
         className={`antialiased bg-lm-black text-white ${pixerFont.className}`}
       >
-        <div className="flex h-dvh w-dvw flex-col">{children}</div>
+        <Suspense>
+          <div className="flex h-dvh w-dvw flex-col">{children}</div>
+        </Suspense>
       </body>
     </html>
   );
