@@ -1,0 +1,38 @@
+{
+  "name": "kaiai-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "nodemon index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/cors": "^2.8.17",
+    "@types/websocket": "^1.0.10",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@ai16z/client-direct": "0.1.5-alpha.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "http": "0.0.1-security",
+    "mongoose": "^8.8.4",
+    "socket.io": "^4.8.1",
+    "typescript": "^5.7.2",
+    "websocket": "^1.0.35",
+    "ws": "^8.18.0"
+  }
+}
