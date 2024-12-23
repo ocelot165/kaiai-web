@@ -166,14 +166,23 @@ export default function Home() {
       ]);
     }
 
-    function onResponse({ data, message }: { data: string; message: string }) {
+    function onResponse(payload: {
+      data: string;
+      message: string;
+      isGift?: boolean;
+    }) {
       if (head.current) {
         head.current.stopSpeaking();
-        head.current.speakText(message, data);
+        head.current.speakText(payload.message, payload.data);
+      }
+      if (head.current && payload?.isGift) {
+        head.current.playAnimation(
+          `/${dances[Math.floor(Math.random() * dances.length)]}.fbx`
+        );
       }
       setMessages((msgs: Record<string, string>[]) => [
         ...msgs,
-        { message: message, context: "kAia" },
+        { message: payload.message, context: "kAia" },
       ]);
     }
 
