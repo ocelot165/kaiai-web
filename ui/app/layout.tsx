@@ -21,7 +21,6 @@ export default function RootLayout({
       <body
         className={`antialiased bg-lm-black text-white ${pixerFont.className}`}
       >
-        <div className="scanlines"></div>
         <div className="flex h-dvh w-dvw flex-col">{children}</div>
       </body>
     </html>
