@@ -22,7 +22,7 @@ export default function RootLayout({
         className={`antialiased bg-lm-black text-white ${pixerFont.className}`}
       >
         <div className="scanlines"></div>
-        <div className="flex h-[100vh] w-[100vw] flex-col">{children}</div>
+        <div className="flex h-dvh w-dvw flex-col">{children}</div>
       </body>
     </html>
   );
