@@ -11,6 +11,7 @@ import { useToastStore } from "../hooks/use-toast-store";
 import Footer from "./components/footer";
 import { dances } from "./constants/dances";
 import YouTube from "react-youtube";
+import { cn } from "./utils/cn";
 
 interface EV {
   lengthComputable: boolean;
@@ -53,6 +54,7 @@ export default function Home() {
   const socketRef = useRef<Socket>();
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToastStore();
+  const [timeout, setTimeoutRef] = useState<NodeJS.Timeout>();
 
   const [danceLoadingStates, updateDanceLoadingStates] = useState<number[]>(
     dances.map(() => 0)
@@ -181,6 +183,10 @@ export default function Home() {
 
   const onClick = useCallback(async () => {
     try {
+      const timeoutRef = setTimeout(() => {
+        setTimeoutRef(undefined);
+      }, 5000);
+      setTimeoutRef(timeoutRef);
       await fetch(`${process.env.NEXT_PUBLIC_BACKEND!}/sendMessage`, {
         method: "POST",
         body: JSON.stringify({ message: text }),
@@ -190,10 +196,13 @@ export default function Home() {
       });
       setText("");
     } catch (error) {
+      setTimeoutRef(undefined);
       addToast("Rate limit hit, try again in 15 minutes", "Error");
       console.log(error);
     }
-  }, [text, addToast]);
+  }, [text, addToast, setTimeoutRef]);
+
+  const buttonDisabled = text === "" || !text || Boolean(timeout);
 
   return (
     <div className="grid grid-cols-7 h-dvh">
@@ -339,11 +348,14 @@ export default function Home() {
             placeholder="Enter Message"
           />
           <Button
-            className="bg-lm-orange text-black hover:text-black"
+            className={cn(
+              "bg-lm-orange text-black hover:text-black",
+              buttonDisabled ? "bg-lm-orange/40" : ""
+            )}
             onClick={onClick}
-            disabled={text === "" || !text}
+            disabled={buttonDisabled}
           >
-            Send
+            {"Send"}
           </Button>
         </div>
       </div>
