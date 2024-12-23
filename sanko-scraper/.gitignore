@@ -13,6 +13,8 @@
 /.next/
 /out/
 
+index.js
+
 # production
 /build
 

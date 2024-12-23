@@ -1,7 +1,7 @@
-import Websocket from "websocket";
-import dotenv from "dotenv";
+import { client as cl } from "websocket";
+import { config } from "dotenv";
 
-dotenv.config();
+config();
 
 type SocketData = {
   host: string;
@@ -35,7 +35,7 @@ type SocketMSG = {
   data: SocketData;
 };
 
-var client = new Websocket.client();
+var client = new cl();
 
 client.on("connectFailed", function (error) {
   console.log("Connect Error: " + error.toString());
