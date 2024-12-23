@@ -157,10 +157,10 @@ export default function Home() {
     if (socketRef.current) return;
     socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_BACKEND!);
 
-    function setMsg({ data }: { data: string }) {
+    function setMsg({ data, context }: { data: string; context: string }) {
       setMessages((msgs: Record<string, string>[]) => [
         ...msgs,
-        { message: data, context: "User" },
+        { message: data, context: context || "User" },
       ]);
     }
 

@@ -13,13 +13,26 @@ dotenv.config();
 const port = 3101;
 const app = express();
 const server = http.createServer(app);
-app.use(cors({ origin: process.env.CORS_ALLOWED_ORIGIN! }));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(bodyParser.json());
 
 const io = new Server(server, {
   cors: { origin: process.env.CORS_ALLOWED_ORIGIN! },
 });
 mongoose.set("strictQuery", false);
+
+type SankoScraperBody = {
+  userName: string;
+  displayContent: string;
+  overrideSpeechContent?: string;
+  isGift: boolean;
+  bearer: string;
+  isAction: boolean;
+};
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -78,12 +91,12 @@ async function getAIResponse(message: string) {
   return aiResult.result.choices[0].message.content;
 }
 
-async function processMessage(message: string) {
+async function processWebMessage(message: string, userName?: string) {
   try {
     //push message to dynamodb
-    await Message.create({ message, context: "User" });
+    await Message.create({ message, context: userName || "User" });
     //send message back to clients
-    await io.emit("message", { data: message });
+    await io.emit("message", { data: message, context: userName || "User" });
     //get the AI's response from  API
     const firstMessage = await getAIResponse(message);
     //push message to dynamodb
@@ -103,6 +116,34 @@ async function processMessage(message: string) {
   }
 }
 
+async function processSankoMessage(
+  message: string,
+  userName: string,
+  isAction: boolean,
+  isGift: boolean,
+  overrideSpeechContent?: string
+) {
+  if (isAction && overrideSpeechContent) {
+    //push message to dynamodb
+    await Message.create({ message: overrideSpeechContent, context: "kAia" });
+    const res = await fetch(
+      process.env.TTS_ENDPOINT! + ("?key=" + process.env.TTS_API_KEY!),
+      getTTSBody(overrideSpeechContent)
+    );
+    const data = await res.json();
+    if (res.status === 200 && data && data.audioContent) {
+      //send tts response and src message
+      await io.emit("response", {
+        data,
+        message: overrideSpeechContent,
+        isGift,
+      });
+    }
+  } else {
+    await processWebMessage(message, userName);
+  }
+}
+
 io.on("connection", (socket) => {
   console.log("client connected");
 });
@@ -110,8 +151,28 @@ io.on("connection", (socket) => {
 app.post("/sendMessage", limiter, (request, response) => {
   try {
     const message = request.body.message;
-    processMessage(message);
+    processWebMessage(message);
     response.status(200).json({ success: true });
+  } catch (error) {
+    console.log(error);
+    response.status(400).json({ success: false });
+  }
+});
+
+app.post("/ingestSankoChat", limiter, async (request, response) => {
+  try {
+    const body: SankoScraperBody = request.body;
+    console.log("in inject sanko chat", body);
+    if (process.env.BEARER! === body.bearer) {
+      await processSankoMessage(
+        body.displayContent,
+        body.userName,
+        body.isAction,
+        body.isGift,
+        body.overrideSpeechContent
+      );
+      response.status(200).json({ success: true });
+    }
   } catch (error) {
     console.log(error);
     response.status(400).json({ success: false });

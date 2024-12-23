@@ -46,17 +46,38 @@ function handleMessage(e: SocketData) {
   if (event.attributes && "GIFT" === e.eventType) {
     let { name, giftName, quantity } = event.attributes;
 
-    const content = `JUST MINTED ${parseInt(quantity) > 1 ? "" : "A"} ${
+    const displayContent = `JUST MINTED ${parseInt(quantity) > 1 ? "" : "A"} ${
       parseInt(quantity) > 1 ? quantity : ""
     } ${giftName}${parseInt(quantity) > 1 ? "S" : ""}`;
 
-    return { userName: name, content, isAction: true };
+    const overrideSpeechContent = `${name} ${displayContent}. Thank you for the donation!`;
+
+    return {
+      userName: name,
+      displayContent,
+      overrideSpeechContent,
+      isGift: true,
+      isAction: false,
+    };
   } else if ("content" in event) {
-    if (event.content.includes("⇒")) return;
+    let content: string = event.content;
+    if (content.includes("⇒")) return;
+    const emotes =
+      event?.emotes?.map((val) => `:${Object.keys(val)[0]}:`) || [];
+    emotes.forEach((emote) => (content = content.replace(emote, "")));
+    content = content.trim();
+    if (!content.length) return;
     const userName = event?.sender?.attributes?.name;
-    const content = event.content;
-    let isAction = false;
-    return { userName, content, isAction };
+    let isAction = e.eventType === "DICEROLL" || e.eventType === "COINFLIP";
+    content = isAction ? `${userName} ${content}` : content;
+    const overrideSpeechContent = isAction ? content : undefined;
+    return {
+      userName,
+      displayContent: content,
+      overrideSpeechContent,
+      isGift: false,
+      isAction,
+    };
   }
 }
 
@@ -69,12 +90,12 @@ client.on("connect", function (connection) {
   connection.on("close", function () {
     console.log("echo-protocol Connection Closed");
   });
-  connection.on("message", function (message) {
+  connection.on("message", async function (message) {
     try {
       if (message.type === "utf8") {
         const msg = message.utf8Data;
         const parsedMessage: SocketMSG = JSON.parse(msg);
-        console.log("parsed message", parsedMessage);
+        console.log("parsed message", JSON.stringify(parsedMessage));
         switch (parsedMessage.event) {
           case "GIFT":
           case "CHAT":
@@ -82,7 +103,28 @@ client.on("connect", function (connection) {
           case "DICEROLL":
           case "COINFLIP": {
             const msg = handleMessage(parsedMessage.data);
-            console.log("processed message", msg);
+            if (msg) {
+              console.log(
+                JSON.stringify({
+                  ...msg,
+                  bearer: process.env.BEARER_TOKEN!,
+                })
+              );
+              const backendUrl = process.env.BACKEND_URL!;
+              await fetch(`${backendUrl}/ingestSankoChat`, {
+                method: "POST",
+                body: JSON.stringify({
+                  ...msg,
+                  bearer: process.env.BEARER_TOKEN!,
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              console.log("processed message", msg);
+            } else {
+              console.log("invalid message");
+            }
           }
         }
       }
@@ -93,7 +135,7 @@ client.on("connect", function (connection) {
 });
 
 client.connect(
-  "wss://chat.sanko.tv/ws?streamerAddress=0xb47b16d12e0b235b77bb3b3183e379a46e812450",
+  "wss://chat.sanko.tv/ws?streamerAddress=0xb651043fba75092a9de3a6d501f99cad5ccb3035",
   "echo-protocol",
   "https://sanko.tv",
   {
